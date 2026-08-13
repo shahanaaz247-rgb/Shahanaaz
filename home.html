@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Home | Shahanaaz Mart</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header class="shop-header">
+
+        <div class="shop-logo">
+            <span class="shop-logo-mark">S</span>
+            <span>Shahanaaz Mart</span>
+        </div>
+
+        <nav class="shop-nav">
+            <a href="home.html" class="active">Home</a>
+            <a href="#categories">Categories</a>
+            <a href="#featured">Products</a>
+            <a href="#offers">Offers</a>
+        </nav>
+
+        <div class="shop-actions">
+
+            <button onclick="showDemoMessage('Search')">
+                🔍
+            </button>
+
+            <button onclick="showDemoMessage('Wishlist')">
+                ♡
+            </button>
+
+            <button onclick="showDemoMessage('Cart')">
+                🛒
+            </button>
+
+            <button onclick="showDemoMessage('Profile')">
+                👤
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- Hero Section -->
+    <main>
+
+        <section class="shop-hero">
+
+            <div class="hero-content">
+
+                <p class="eyebrow">
+                    WELCOME TO SHAHANAAZ MART
+                </p>
+
+                <h1>
+                    Find something
+                    <span>worth bringing home.</span>
+                </h1>
+
+                <p>
+                    Explore carefully selected products across fashion,
+                    electronics, home essentials, beauty and more.
+                </p>
+
+                <button
+                    class="shop-now-button"
+                    onclick="scrollToProducts()"
+                >
+                    Shop Now →
+                </button>
+
+            </div>
+
+
+            <div class="hero-visual">
+
+                <div class="hero-circle"></div>
+
+                <div class="hero-product-card">
+                    <span>✦</span>
+                    <strong>Fresh Finds</strong>
+                    <small>New collections are here</small>
+                </div>
+
+                <div class="floating-tag">
+                    New Arrivals
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Categories -->
+        <section class="shop-section" id="categories">
+
+            <div class="section-heading">
+
+                <div>
+                    <p class="eyebrow">EXPLORE</p>
+                    <h2>Shop by category</h2>
+                </div>
+
+                <p>
+                    Find what you need faster.
+                </p>
+
+            </div>
+
+
+            <div class="category-grid">
+
+                <button class="category-card">
+                    <span>👗</span>
+                    <strong>Fashion</strong>
+                    <small>Style & clothing</small>
+                </button>
+
+                <button class="category-card">
+                    <span>💻</span>
+                    <strong>Electronics</strong>
+                    <small>Tech essentials</small>
+                </button>
+
+                <button class="category-card">
+                    <span>🏠</span>
+                    <strong>Home</strong>
+                    <small>Make it yours</small>
+                </button>
+
+                <button class="category-card">
+                    <span>✨</span>
+                    <strong>Beauty</strong>
+                    <small>Everyday care</small>
+                </button>
+
+                <button class="category-card">
+                    <span>👜</span>
+                    <strong>Accessories</strong>
+                    <small>Complete your look</small>
+                </button>
+
+                <button class="category-card">
+                    <span>⚽</span>
+                    <strong>Sports</strong>
+                    <small>Move & play</small>
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- Featured Products -->
+        <section class="shop-section" id="featured">
+
+            <div class="section-heading">
+
+                <div>
+                    <p class="eyebrow">CURATED FOR YOU</p>
+                    <h2>Featured products</h2>
+                </div>
+
+                <button
+                    class="view-button"
+                    onclick="showDemoMessage('All Products')"
+                >
+                    View all →
+                </button>
+
+            </div>
+
+
+            <div class="product-grid">
+
+                <!-- Product 1 -->
+                <article class="product-card">
+
+                    <div class="product-image">
+                        🎧
+                        <button
+                            class="wishlist-button"
+                            onclick="showDemoMessage('Wishlist')"
+                        >
+                            ♡
+                        </button>
+                    </div>
+
+                    <div class="product-info">
+
+                        <p>Electronics</p>
+
+                        <h3>
+                            Wireless Headphones
+                        </h3>
+
+                        <span class="product-description">
+                            Comfortable everyday audio
+                        </span>
+
+                        <div class="product-bottom">
+
+                            <strong>₹1,899</strong>
+
+                            <span class="rating">
+                                ★ 4.6
+                            </span>
+
+                        </div>
+
+                        <button
+                            class="cart-button"
+                            onclick="showDemoMessage('Wireless Headphones added to cart')"
+                        >
+                            Add to Cart
+                        </button>
+
+                    </div>
+
+                </article>
+
+
+                <!-- Product 2 -->
+                <article class="product-card">
+
+                    <div class="product-image">
+                        👟
+                        <button
+                            class="wishlist-button"
+                            onclick="showDemoMessage('Wishlist')"
+                        >
+                            ♡
+                        </button>
+                    </div>
+
+                    <div class="product-info">
+
+                        <p>Fashion</p>
+
+                        <h3>
+                            Everyday Sneakers
+                        </h3>
+
+                        <span class="product-description">
+                            Lightweight casual footwear
+                        </span>
+
+                        <div class="product-bottom">
+
+                            <strong>₹2,299</strong>
+
+                            <span class="rating">
+                                ★ 4.7
+                            </span>
+
+                        </div>
+
+                        <button
+                            class="cart-button"
+                            onclick="showDemoMessage('Everyday Sneakers added to cart')"
+                        >
+                            Add to Cart
+                        </button>
+
+                    </div>
+
+                </article>
+
+
+                <!-- Product 3 -->
+                <article class="product-card">
+
+                    <div class="product-image">
+                        👜
+                        <button
+                            class="wishlist-button"
+                            onclick="showDemoMessage('Wishlist')"
+                        >
+                            ♡
+                        </button>
+                    </div>
+
+                    <div class="product-info">
+
+                        <p>Accessories</p>
+
+                        <h3>
+                            Classic Handbag
+                        </h3>
+
+                        <span class="product-description">
+                            Elegant everyday carry
+                        </span>
+
+                        <div class="product-bottom">
+
+                            <strong>₹1,499</strong>
+
+                            <span class="rating">
+                                ★ 4.5
+                            </span>
+
+                        </div>
+
+                        <button
+                            class="cart-button"
+                            onclick="showDemoMessage('Classic Handbag added to cart')"
+                        >
+                            Add to Cart
+                        </button>
+
+                    </div>
+
+                </article>
+
+
+                <!-- Product 4 -->
+                <article class="product-card">
+
+                    <div class="product-image">
+                        🪴
+                        <button
+                            class="wishlist-button"
+                            onclick="showDemoMessage('Wishlist')"
+                        >
+                            ♡
+                        </button>
+                    </div>
+
+                    <div class="product-info">
+
+                        <p>Home</p>
+
+                        <h3>
+                            Minimal Plant Pot
+                        </h3>
+
+                        <span class="product-description">
+                            Simple decor for your space
+                        </span>
+
+                        <div class="product-bottom">
+
+                            <strong>₹699</strong>
+
+                            <span class="rating">
+                                ★ 4.8
+                            </span>
+
+                        </div>
+
+                        <button
+                            class="cart-button"
+                            onclick="showDemoMessage('Minimal Plant Pot added to cart')"
+                        >
+                            Add to Cart
+                        </button>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+        </section>
+
+
+        <!-- Offer Banner -->
+        <section class="offer-section" id="offers">
+
+            <div>
+
+                <p class="eyebrow">
+                    LIMITED TIME
+                </p>
+
+                <h2>
+                    A little more value,
+                    <span>a lot more to explore.</span>
+                </h2>
+
+                <p>
+                    Discover selected products and special offers
+                    available on Shahanaaz Mart.
+                </p>
+
+                <button
+                    onclick="scrollToProducts()"
+                >
+                    Explore Offers →
+                </button>
+
+            </div>
+
+            <div class="offer-symbol">
+                %
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="shop-footer">
+
+        <div>
+            <strong>Shahanaaz Mart</strong>
+            <p>Your marketplace, your choice.</p>
+        </div>
+
+        <div>
+            <p>Shop • Discover • Enjoy</p>
+            <p>© 2026 Shahanaaz Mart</p>
+        </div>
+
+    </footer>
+
+
+    <script src="script.js"></script>
+
+</body>
+</html>
