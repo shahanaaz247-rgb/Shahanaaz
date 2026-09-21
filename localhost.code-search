@@ -1,0 +1,140 @@
+# Query: localhost
+# ContextLines: 1
+
+31 results - 13 files
+
+admin-login.html:
+  131              await fetch(
+  132:                 "http://localhost:5000/api/login",
+  133                  {
+
+admin.html:
+   528              await fetch(
+   529:                 "http://localhost:5000/api/admin/users"
+   530              );
+
+   537              await fetch(
+   538:                 "http://localhost:5000/api/products"
+   539              );
+
+   546              await fetch(
+   547:                 "http://localhost:5000/api/admin/orders"
+   548              );
+
+   788              await fetch(
+   789:                 `http://localhost:5000/api/admin/orders/${orderId}`,
+   790                  {
+
+  1011                  await fetch(
+  1012:                     `http://localhost:5000/api/admin/products/${editingProductId}`,
+  1013                      {
+
+  1045                  await fetch(
+  1046:                     "http://localhost:5000/api/products",
+  1047                      {
+
+  1137              await fetch(
+  1138:                 `http://localhost:5000/api/admin/products/${productId}`,
+  1139                  {
+
+cart.html:
+  260              await fetch(
+  261:                 "http://localhost:5000/api/cart/"
+  262                  + userId
+
+  365                      class="cart-image"
+  366:                     src="http://localhost:5000/images/${imageName}"
+  367                      alt="${item.name}"
+
+  488              await fetch(
+  489:                 "http://localhost:5000/api/cart/"
+  490                  + cartId,
+
+  548              await fetch(
+  549:                 "http://localhost:5000/api/cart/"
+  550                  + cartId,
+
+checkout.html:
+  343              await fetch(
+  344:                 "http://localhost:5000/api/cart/" +
+  345                  user.user_id
+
+  568                  await fetch(
+  569:                     "http://localhost:5000/api/orders",
+  570                      {
+
+home.html:
+  329              await fetch(
+  330:                 "http://localhost:5000/api/products"
+  331              );
+
+  381                      <img
+  382:                         src="http://localhost:5000/images/${imageName}"
+  383                          alt="${product.name}"
+
+  500              await fetch(
+  501:                 "http://localhost:5000/api/cart",
+  502                  {
+
+login.html:
+  298                  await fetch(
+  299:                     "http://localhost:5000/api/login",
+  300                      {
+
+orders.html:
+  497              await fetch(
+  498:                 "http://localhost:5000/api/orders/" +
+  499                  userId
+
+script.js:
+   58                  const response = await fetch(
+   59:                     "http://localhost:5000/api/login",
+   60                      {
+
+  146                  const response = await fetch(
+  147:                     "http://localhost:5000/api/register",
+  148                      {
+
+  276          const response = await fetch(
+  277:             "http://localhost:5000/api/cart",
+  278              {
+
+seller_register.html:
+  259                      await fetch(
+  260:                         "http://localhost:5000/api/seller/register",
+  261                          {
+
+seller-login.html:
+  182                  await fetch(
+  183:                     "http://localhost:5000/api/login",
+  184                      {
+
+seller.html:
+   605      return (
+   606:         "http://localhost:5000/images/" +
+   607          encodeURIComponent(image)
+
+   642              await fetch(
+   643:                 "http://localhost:5000/api/products/seller/" +
+   644                  sellerId
+
+   970                      await fetch(
+   971:                         "http://localhost:5000/api/products/" +
+   972                          productId,
+
+  1072                      await fetch(
+  1073:                         "http://localhost:5000/api/products",
+  1074                          {
+
+  1141              await fetch(
+  1142:                 "http://localhost:5000/api/products/" +
+  1143                  productId,
+
+server.js:
+  11  app.listen(PORT, () => {
+  12:     console.log(`Server running at http://localhost:${PORT}`);
+  13  });
+
+backend\.env:
+  1: DB_HOST=localhost
+  2  DB_USER=root

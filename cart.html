@@ -258,7 +258,7 @@ async function loadCart() {
 
         const response =
             await fetch(
-                "http://localhost:5000/api/cart/"
+                "https://shahanaaz-production.up.railway.app/api/cart/"
                 + userId
             );
 
@@ -363,7 +363,7 @@ function displayCart() {
 
                 <img
                     class="cart-image"
-                    src="http://localhost:5000/images/${imageName}"
+                    src="https://shahanaaz-production.up.railway.app/images/${imageName}"
                     alt="${item.name}"
                     onerror="
                         this.style.display='none';
@@ -486,7 +486,7 @@ async function changeQuantity(cartId, quantity) {
 
         const response =
             await fetch(
-                "http://localhost:5000/api/cart/"
+                "https://shahanaaz-production.up.railway.app/api/cart/"
                 + cartId,
                 {
                     method: "PUT",
@@ -546,7 +546,7 @@ async function removeFromCart(cartId) {
 
         const response =
             await fetch(
-                "http://localhost:5000/api/cart/"
+                "https://shahanaaz-production.up.railway.app/api/cart/"
                 + cartId,
                 {
                     method: "DELETE"

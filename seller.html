@@ -603,7 +603,7 @@ function getImageUrl(image) {
 
 
     return (
-        "http://localhost:5000/images/" +
+        "https://shahanaaz-production.up.railway.app/images/" +
         encodeURIComponent(image)
     );
 
@@ -640,7 +640,7 @@ async function loadProducts() {
 
         const response =
             await fetch(
-                "http://localhost:5000/api/products/seller/" +
+                "https://shahanaaz-production.up.railway.app/api/products/seller/" +
                 sellerId
             );
 
@@ -968,7 +968,7 @@ document.getElementById(
 
                 const response =
                     await fetch(
-                        "http://localhost:5000/api/products/" +
+                        "https://shahanaaz-production.up.railway.app/api/products/" +
                         productId,
                         {
                             method: "PUT",
@@ -1070,7 +1070,7 @@ document.getElementById(
 
                 const response =
                     await fetch(
-                        "http://localhost:5000/api/products",
+                        "https://shahanaaz-production.up.railway.app/api/products",
                         {
                             method: "POST",
                             body: formData
@@ -1139,7 +1139,7 @@ async function deleteProduct(productId) {
 
         const response =
             await fetch(
-                "http://localhost:5000/api/products/" +
+                "https://shahanaaz-production.up.railway.app/api/products/" +
                 productId,
                 {
                     method: "DELETE",

@@ -327,7 +327,7 @@ async function loadProducts() {
 
         const response =
             await fetch(
-                "http://localhost:5000/api/products"
+                "https://shahanaaz-production.up.railway.app/api/products"
             );
 
 
@@ -379,7 +379,7 @@ async function loadProducts() {
                 <div class="product-image">
 
                     <img
-                        src="http://localhost:5000/images/${imageName}"
+                        src="https://shahanaaz-production.up.railway.app/images/${imageName}"
                         alt="${product.name}"
                         style="
                             width:100%;
@@ -498,7 +498,7 @@ async function addToCart(productId) {
 
         const response =
             await fetch(
-                "http://localhost:5000/api/cart",
+                "https://shahanaaz-production.up.railway.app/api/cart",
                 {
                     method: "POST",
 
