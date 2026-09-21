@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>My Orders | Shahanaaz Mart</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f5f7fb;
+            color: #222;
+        }
+
+        header {
+            background: #111827;
+            color: white;
+            padding: 18px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 24px;
+        }
+
+        .back-btn {
+            background: white;
+            color: #111827;
+            border: none;
+            padding: 9px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .title {
+            margin-bottom: 25px;
+        }
+
+        .title h2 {
+            margin-bottom: 8px;
+        }
+
+        .order-card {
+            background: white;
+            border-radius: 12px;
+            padding: 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+            margin-bottom: 18px;
+        }
+
+        .order-id {
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .status {
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            background: #e5e7eb;
+        }
+
+        .status.Placed {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .status.Shipped {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status.Out-for-Delivery {
+            background: #ede9fe;
+            color: #6d28d9;
+        }
+
+        .status.Delivered {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .order-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .detail-box {
+            background: #f9fafb;
+            padding: 14px;
+            border-radius: 8px;
+        }
+
+        .detail-box small {
+            display: block;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .detail-box strong {
+            font-size: 16px;
+        }
+
+        .tracking {
+            margin-top: 20px;
+        }
+
+        .tracking h3 {
+            margin-bottom: 18px;
+        }
+
+        .steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .steps::before {
+            content: "";
+            position: absolute;
+            top: 14px;
+            left: 5%;
+            right: 5%;
+            height: 3px;
+            background: #ddd;
+            z-index: 0;
+        }
+
+        .step {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            width: 25%;
+        }
+
+        .circle {
+            width: 30px;
+            height: 30px;
+            margin: 0 auto 8px;
+            border-radius: 50%;
+            background: #ddd;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .step.active .circle {
+            background: #16a34a;
+        }
+
+        .step.active p {
+            color: #166534;
+            font-weight: bold;
+        }
+
+        .step p {
+            font-size: 13px;
+        }
+
+        .empty {
+            background: white;
+            padding: 40px;
+            text-align: center;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        }
+
+        .empty h3 {
+            margin-bottom: 10px;
+        }
+
+        .shop-btn {
+            margin-top: 18px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 11px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .error {
+            color: #dc2626;
+        }
+
+        @media (max-width: 700px) {
+
+            header {
+                padding: 15px;
+            }
+
+            header h1 {
+                font-size: 19px;
+            }
+
+            .container {
+                padding: 0 12px;
+            }
+
+            .order-details {
+                grid-template-columns: 1fr;
+            }
+
+            .steps::before {
+                display: none;
+            }
+
+            .steps {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .step {
+                width: 100%;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                text-align: left;
+            }
+
+            .circle {
+                margin: 0;
+                flex-shrink: 0;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<header>
+
+    <h1>Shahanaaz Mart</h1>
+
+    <button
+        class="back-btn"
+        onclick="goHome()">
+
+        Back to Home
+
+    </button>
+
+</header>
+
+
+<div class="container">
+
+    <div class="title">
+
+        <h2>My Orders</h2>
+
+        <p>
+            Track your orders and delivery status.
+        </p>
+
+    </div>
+
+    <div id="ordersContainer"></div>
+
+</div>
+
+
+<script>
+
+
+// ================= GET USER =================
+
+function getUserId() {
+
+    let user = null;
+
+    try {
+
+        user =
+            JSON.parse(
+                localStorage.getItem("user")
+            );
+
+    } catch (error) {
+
+        user = null;
+
+    }
+
+
+    if (user && user.user_id) {
+
+        return Number(user.user_id);
+
+    }
+
+
+    const storedId =
+        localStorage.getItem("user_id");
+
+
+    if (storedId) {
+
+        return Number(storedId);
+
+    }
+
+
+    return null;
+
+}
+
+
+// ================= USER ID =================
+
+const userId =
+    getUserId();
+
+
+console.log(
+    "Logged User ID:",
+    userId
+);
+
+
+// ================= CHECK LOGIN =================
+
+if (!userId) {
+
+    alert(
+        "Please login again"
+    );
+
+    window.location.href =
+        "login.html";
+
+}
+
+
+// ================= STATUS =================
+
+function getStatusIndex(status) {
+
+    const statuses = [
+        "Placed",
+        "Shipped",
+        "Out for Delivery",
+        "Delivered"
+    ];
+
+    return statuses.indexOf(status);
+
+}
+
+
+// ================= TRACKING =================
+
+function createTracking(status) {
+
+    const statuses = [
+        "Placed",
+        "Shipped",
+        "Out for Delivery",
+        "Delivered"
+    ];
+
+    let currentIndex =
+        getStatusIndex(status);
+
+
+    if (currentIndex < 0) {
+
+        currentIndex = 0;
+
+    }
+
+
+    return `
+
+        <div class="tracking">
+
+            <h3>
+                Order Tracking
+            </h3>
+
+            <div class="steps">
+
+                ${statuses.map(
+                    (item, index) => {
+
+                        return `
+
+                            <div
+                                class="step ${
+                                    index <= currentIndex
+                                        ? "active"
+                                        : ""
+                                }">
+
+                                <div class="circle">
+                                    ${index + 1}
+                                </div>
+
+                                <p>
+                                    ${item}
+                                </p>
+
+                            </div>
+
+                        `;
+
+                    }
+                ).join("")}
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+
+// ================= LOAD ORDERS =================
+
+async function loadOrders() {
+
+    const container =
+        document.getElementById(
+            "ordersContainer"
+        );
+
+
+    container.innerHTML = `
+
+        <div class="empty">
+
+            <h3>
+                Loading Orders...
+            </h3>
+
+        </div>
+
+    `;
+
+
+    try {
+
+        if (!userId) {
+
+            throw new Error(
+                "User ID not found"
+            );
+
+        }
+
+
+        console.log(
+            "Fetching orders for:",
+            userId
+        );
+
+
+        const response =
+            await fetch(
+                "http://localhost:5000/api/orders/" +
+                userId
+            );
+
+
+        console.log(
+            "Server status:",
+            response.status
+        );
+
+
+        const text =
+            await response.text();
+
+
+        console.log(
+            "Server response:",
+            text
+        );
+
+
+        let orders;
+
+
+        try {
+
+            orders =
+                JSON.parse(text);
+
+        } catch (error) {
+
+            throw new Error(
+                "Backend returned an invalid response"
+            );
+
+        }
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                orders.message ||
+                "Failed to load orders"
+            );
+
+        }
+
+
+        if (
+            !Array.isArray(orders) ||
+            orders.length === 0
+        ) {
+
+            container.innerHTML = `
+
+                <div class="empty">
+
+                    <h3>
+                        No Orders Yet
+                    </h3>
+
+                    <p>
+                        You haven't placed any orders.
+                    </p>
+
+                    <button
+                        class="shop-btn"
+                        onclick="goHome()">
+
+                        Start Shopping
+
+                    </button>
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        container.innerHTML =
+            orders.map(order => {
+
+                const status =
+                    order.order_status ||
+                    "Placed";
+
+
+                const statusClass =
+                    status.replace(
+                        / /g,
+                        "-"
+                    );
+
+
+                return `
+
+                    <div class="order-card">
+
+                        <div class="order-header">
+
+                            <div class="order-id">
+
+                                Order #${order.order_id}
+
+                            </div>
+
+                            <div
+                                class="status ${statusClass}">
+
+                                ${status}
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="order-details">
+
+                            <div class="detail-box">
+
+                                <small>
+                                    Total Amount
+                                </small>
+
+                                <strong>
+                                    ₹${Number(
+                                        order.total_amount
+                                    ).toFixed(2)}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="detail-box">
+
+                                <small>
+                                    Payment
+                                </small>
+
+                                <strong>
+                                    ${order.payment_status || "Pending"}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="detail-box">
+
+                                <small>
+                                    Order Status
+                                </small>
+
+                                <strong>
+                                    ${status}
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="detail-box">
+
+                            <small>
+                                Delivery Address
+                            </small>
+
+                            <strong>
+                                ${order.address || "Not available"}
+                            </strong>
+
+                        </div>
+
+
+                        ${createTracking(status)}
+
+                    </div>
+
+                `;
+
+            }).join("");
+
+
+    } catch (error) {
+
+        console.error(
+            "ORDER ERROR:",
+            error
+        );
+
+
+        container.innerHTML = `
+
+            <div class="empty">
+
+                <h3 class="error">
+                    Failed to Load Orders
+                </h3>
+
+                <p>
+                    ${error.message}
+                </p>
+
+                <button
+                    class="shop-btn"
+                    onclick="loadOrders()">
+
+                    Try Again
+
+                </button>
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+// ================= HOME =================
+
+function goHome() {
+
+    window.location.href =
+        "home.html";
+
+}
+
+
+// ================= START =================
+
+if (userId) {
+
+    loadOrders();
+
+}
+
+</script>
+
+</body>
+
+</html>

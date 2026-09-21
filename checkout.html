@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+    <title>Checkout | Shahanaaz Mart</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f7f1e7;
+            color: #2f2a24;
+        }
+
+        .header {
+            background: white;
+            padding: 25px 7%;
+            border-bottom: 1px solid #e2d7c8;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+
+        .checkout-container {
+            width: 86%;
+            max-width: 1100px;
+            margin: 40px auto;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 25px;
+        }
+
+        .checkout-card {
+            background: white;
+            padding: 25px;
+            border-radius: 18px;
+            box-shadow: 0 5px 18px rgba(0,0,0,0.06);
+        }
+
+        .checkout-card h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            border: 1px solid #d8cec1;
+            border-radius: 8px;
+            font-size: 15px;
+            height: 100px;
+            resize: vertical;
+        }
+
+        .payment-option {
+            margin: 12px 0;
+        }
+
+        .payment-option label {
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        .payment-option input {
+            margin-right: 8px;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .total {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .place-order {
+            width: 100%;
+            margin-top: 25px;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background: #2f2a24;
+            color: white;
+            font-size: 17px;
+            cursor: pointer;
+        }
+
+        .place-order:hover {
+            opacity: 0.9;
+        }
+
+        .place-order:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .success-box {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .success-box h2 {
+            color: green;
+        }
+
+        .home-button,
+        .orders-button {
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            background: #2f2a24;
+            color: white;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+
+        .orders-button {
+            background: #2563eb;
+            margin-left: 10px;
+        }
+
+        @media (max-width: 700px) {
+
+            .checkout-container {
+                grid-template-columns: 1fr;
+            }
+
+            .orders-button {
+                margin-left: 0;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<header class="header">
+
+    <h1>🛍️ Checkout</h1>
+
+</header>
+
+
+<main class="checkout-container">
+
+
+    <!-- DELIVERY DETAILS -->
+
+    <div class="checkout-card">
+
+        <h2>Delivery Details</h2>
+
+        <form id="checkoutForm">
+
+            <label for="address">
+                Delivery Address
+            </label>
+
+            <textarea
+                id="address"
+                placeholder="Enter your complete delivery address"
+                required></textarea>
+
+
+            <h2 style="margin-top:30px;">
+                Payment Method
+            </h2>
+
+
+            <div class="payment-option">
+
+                <label>
+
+                    <input
+                        type="radio"
+                        name="payment"
+                        value="Cash on Delivery"
+                        checked>
+
+                    Cash on Delivery
+
+                </label>
+
+            </div>
+
+
+            <div class="payment-option">
+
+                <label>
+
+                    <input
+                        type="radio"
+                        name="payment"
+                        value="UPI">
+
+                    UPI
+
+                </label>
+
+            </div>
+
+
+            <div class="payment-option">
+
+                <label>
+
+                    <input
+                        type="radio"
+                        name="payment"
+                        value="Card">
+
+                    Card
+
+                </label>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="place-order"
+                id="placeOrderButton">
+
+                Place Order
+
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- ORDER SUMMARY -->
+
+    <div class="checkout-card">
+
+        <h2>Order Summary</h2>
+
+        <div id="orderItems">
+            Loading...
+        </div>
+
+        <div class="total">
+
+            <span>Total</span>
+
+            <span id="orderTotal">
+                ₹0
+            </span>
+
+        </div>
+
+    </div>
+
+
+</main>
+
+
+<script>
+
+
+let cart = [];
+
+let total = 0;
+
+
+// ========================================
+// GET USER
+// ========================================
+
+function getUser() {
+
+    try {
+
+        return JSON.parse(
+            localStorage.getItem("user") || "null"
+        );
+
+    } catch (error) {
+
+        return null;
+
+    }
+
+}
+
+
+// ========================================
+// LOAD CHECKOUT
+// ========================================
+
+async function loadCheckout() {
+
+    const user =
+        getUser();
+
+
+    if (!user || !user.user_id) {
+
+        alert("Please login first.");
+
+        window.location.href =
+            "login.html";
+
+        return;
+
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                "http://localhost:5000/api/cart/" +
+                user.user_id
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.message ||
+                "Failed to load cart"
+            );
+
+        }
+
+
+        cart = data;
+
+
+        if (!Array.isArray(cart) ||
+            cart.length === 0) {
+
+            alert(
+                "Your cart is empty."
+            );
+
+            window.location.href =
+                "cart.html";
+
+            return;
+
+        }
+
+
+        let html = "";
+
+        total = 0;
+
+
+        cart.forEach(item => {
+
+            const price =
+                Number(item.price);
+
+            const quantity =
+                Number(item.quantity);
+
+            const itemTotal =
+                price * quantity;
+
+
+            total += itemTotal;
+
+
+            html += `
+
+                <div class="order-item">
+
+                    <span>
+                        ${item.name}
+                        × ${quantity}
+                    </span>
+
+                    <span>
+                        ₹${itemTotal.toLocaleString("en-IN")}
+                    </span>
+
+                </div>
+
+            `;
+
+        });
+
+
+        document.getElementById(
+            "orderItems"
+        ).innerHTML = html;
+
+
+        document.getElementById(
+            "orderTotal"
+        ).innerText =
+            "₹" +
+            total.toLocaleString("en-IN");
+
+
+    } catch (error) {
+
+        console.error(
+            "Checkout loading error:",
+            error
+        );
+
+
+        document.getElementById(
+            "orderItems"
+        ).innerHTML = `
+            <p style="color:red;">
+                Unable to load cart.
+            </p>
+        `;
+
+    }
+
+}
+
+
+// ========================================
+// PLACE ORDER
+// ========================================
+
+document.getElementById(
+    "checkoutForm"
+).addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+
+        const user =
+            getUser();
+
+
+        if (!user || !user.user_id) {
+
+            alert(
+                "Please login again."
+            );
+
+            window.location.href =
+                "login.html";
+
+            return;
+
+        }
+
+
+        const address =
+            document.getElementById(
+                "address"
+            ).value.trim();
+
+
+        const payment =
+            document.querySelector(
+                'input[name="payment"]:checked'
+            );
+
+
+        if (!address) {
+
+            alert(
+                "Please enter delivery address."
+            );
+
+            return;
+
+        }
+
+
+        if (!payment) {
+
+            alert(
+                "Please select payment method."
+            );
+
+            return;
+
+        }
+
+
+        if (!cart || cart.length === 0) {
+
+            alert(
+                "Your cart is empty."
+            );
+
+            return;
+
+        }
+
+
+        if (total <= 0) {
+
+            alert(
+                "Invalid order total."
+            );
+
+            return;
+
+        }
+
+
+        const button =
+            document.getElementById(
+                "placeOrderButton"
+            );
+
+
+        button.disabled = true;
+
+        button.innerText =
+            "Placing Order...";
+
+
+        try {
+
+
+            console.log(
+                "Sending order:",
+                {
+                    user_id: user.user_id,
+                    total_amount: total,
+                    address: address,
+                    payment_method: payment.value
+                }
+            );
+
+
+            const response =
+                await fetch(
+                    "http://localhost:5000/api/orders",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+
+                            user_id:
+                                Number(user.user_id),
+
+                            total_amount:
+                                Number(total.toFixed(2)),
+
+                            address:
+                                address,
+
+                            payment_method:
+                                payment.value
+
+                        })
+
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            console.log(
+                "Order response:",
+                data
+            );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.message ||
+                    "Failed to place order"
+                );
+
+            }
+
+
+            // =================================
+            // SUCCESS
+            // =================================
+
+            document.querySelector(
+                ".checkout-container"
+            ).innerHTML = `
+
+                <div
+                    class="checkout-card success-box"
+                    style="grid-column:1 / -1;"
+                >
+
+                    <h2>
+                        ✅ Order Placed Successfully!
+                    </h2>
+
+                    <p>
+                        Order ID:
+                        <strong>
+                            #${data.order_id}
+                        </strong>
+                    </p>
+
+                    <p>
+                        Total Amount:
+                        <strong>
+                            ₹${total.toLocaleString("en-IN")}
+                        </strong>
+                    </p>
+
+                    <p>
+                        Payment Method:
+                        <strong>
+                            ${payment.value}
+                        </strong>
+                    </p>
+
+                    <p>
+                        Your order has been successfully placed.
+                    </p>
+
+
+                    <button
+                        class="orders-button"
+                        onclick="
+                            window.location.href='orders.html'
+                        "
+                    >
+                        Track My Order
+                    </button>
+
+
+                    <button
+                        class="home-button"
+                        onclick="
+                            window.location.href='home.html'
+                        "
+                    >
+                        Continue Shopping
+                    </button>
+
+                </div>
+
+            `;
+
+
+        } catch (error) {
+
+            console.error(
+                "ORDER ERROR:",
+                error
+            );
+
+
+            alert(
+                "Failed to place order: " +
+                error.message
+            );
+
+
+            button.disabled = false;
+
+            button.innerText =
+                "Place Order";
+
+        }
+
+    }
+);
+
+
+// ========================================
+// START
+// ========================================
+
+loadCheckout();
+
+</script>
+
+
+</body>
+
+</html>

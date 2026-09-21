@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login | Shahanaaz Mart</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="top-bar">
+
+    <div class="logo">
+        <span class="logo-mark">S</span>
+        <span>Shahanaaz Mart</span>
+    </div>
+
+    <a href="index.html" class="back-link">
+        ← Back
+    </a>
+
+</header>
+
+
+<main class="login-page">
+
+    <section class="login-container">
+
+        <div class="login-intro">
+
+            <p class="eyebrow">
+                WELCOME BACK
+            </p>
+
+            <h1>
+                Your shopping
+                <span>starts here.</span>
+            </h1>
+
+            <p>
+                Sign in to explore products, manage your wishlist,
+                and continue your shopping journey at Shahanaaz Mart.
+            </p>
+
+            <div class="login-highlight">
+
+                <span>✦</span>
+
+                <div>
+                    <strong>Shop with ease</strong>
+                    <small>Discover products made for you.</small>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="login-card">
+
+            <div class="login-heading">
+
+                <h2 id="loginTitle">
+                    Login
+                </h2>
+
+                <p>
+                    Enter your details to continue.
+                </p>
+
+            </div>
+
+
+            <form id="loginForm">
+
+                <div class="form-group">
+
+                    <label for="email">
+                        Email or Phone Number
+                    </label>
+
+                    <input
+                        type="text"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your email or phone"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="password">
+                        Password
+                    </label>
+
+                    <div class="password-box">
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Enter your password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            class="show-password"
+                            onclick="togglePassword()"
+                        >
+                            Show
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="login-options">
+
+                    <label class="remember-me">
+
+                        <input
+                            type="checkbox"
+                            id="rememberMe"
+                        >
+
+                        <span>Remember me</span>
+
+                    </label>
+
+                    <a
+                        href="#"
+                        onclick="forgotPassword(event)"
+                    >
+                        Forgot password?
+                    </a>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="login-button"
+                >
+                    Login to Shahanaaz Mart
+                </button>
+
+
+                <div class="divider">
+
+                    <span>
+                        or continue with
+                    </span>
+
+                </div>
+
+
+                <div class="social-buttons">
+
+                    <button
+                        type="button"
+                        class="social-button"
+                        onclick="demoSocialLogin('Google')"
+                    >
+                        <span>G</span>
+                        Google
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="social-button"
+                        onclick="demoSocialLogin('Apple')"
+                    >
+                        <span>●</span>
+                        Apple
+                    </button>
+
+                </div>
+
+
+                <p class="signup-text">
+
+                    New to Shahanaaz Mart?
+
+                    <a href="register.html">
+                        Create an account
+                    </a>
+
+                </p>
+
+            </form>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer>
+
+    <p>
+        © 2026 Shahanaaz Mart
+    </p>
+
+    <p>
+        Buyer / Seller Portal
+    </p>
+
+</footer>
+
+
+<script>
+
+function togglePassword() {
+
+    const password =
+        document.getElementById("password");
+
+    const button =
+        document.querySelector(".show-password");
+
+    if (password.type === "password") {
+
+        password.type = "text";
+
+        button.textContent = "Hide";
+
+    } else {
+
+        password.type = "password";
+
+        button.textContent = "Show";
+
+    }
+}
+
+
+function forgotPassword(event) {
+
+    event.preventDefault();
+
+    alert(
+        "Password reset feature will be added later."
+    );
+}
+
+
+function demoSocialLogin(type) {
+
+    alert(
+        type + " login will be added later."
+    );
+}
+
+
+document
+    .getElementById("loginForm")
+    .addEventListener("submit", async function(event) {
+
+        event.preventDefault();
+
+        const email =
+            document
+                .getElementById("email")
+                .value
+                .trim();
+
+        const password =
+            document
+                .getElementById("password")
+                .value
+                .trim();
+
+
+        if (!email || !password) {
+
+            alert(
+                "Please enter email and password."
+            );
+
+            return;
+        }
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "http://localhost:5000/api/login",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            email: email,
+                            password: password
+                        })
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                alert(
+                    data.message ||
+                    "Login failed."
+                );
+
+                return;
+            }
+
+
+            const user = data.user;
+
+
+            localStorage.setItem(
+                "user",
+                JSON.stringify(user)
+            );
+
+            localStorage.setItem(
+                "user_id",
+                user.user_id
+            );
+
+            localStorage.setItem(
+                "user_role",
+                user.role
+            );
+
+
+            if (user.role === "seller") {
+
+                alert(
+                    "Seller login successful!"
+                );
+
+                window.location.href =
+                    "seller.html";
+
+                return;
+            }
+
+
+            if (user.role === "buyer") {
+
+                alert(
+                    "Buyer login successful!"
+                );
+
+                window.location.href =
+                    "home.html";
+
+                return;
+            }
+
+
+            if (user.role === "admin") {
+
+                alert(
+                    "Admin login successful!"
+                );
+
+                alert(
+                    "Admin dashboard will be added later."
+                );
+
+                return;
+            }
+
+
+            alert(
+                "Invalid user role."
+            );
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Login Error:",
+                error
+            );
+
+            alert(
+                "Server connection failed. Please make sure the backend is running."
+            );
+        }
+
+    });
+
+</script>
+
+</body>
+
+</html>
