@@ -526,7 +526,7 @@ async function loadDashboard() {
 
         const usersResponse =
             await fetch(
-                "https://shahanaaz-production.up.railway.app/api/admin/users"
+                "https://shahanaaz-production-4093.up.railway.app/api/admin/users"
             );
 
         const users =
@@ -535,7 +535,7 @@ async function loadDashboard() {
 
         const productsResponse =
             await fetch(
-                "https://shahanaaz-production.up.railway.app/api/products"
+                "https://shahanaaz-production-4093.up.railway.app/api/products"
             );
 
         const products =
@@ -544,7 +544,7 @@ async function loadDashboard() {
 
         const ordersResponse =
             await fetch(
-                "https://shahanaaz-production.up.railway.app/api/admin/orders"
+                "https://shahanaaz-production-4093.up.railway.app/api/admin/orders"
             );
 
         const orders =
@@ -786,7 +786,7 @@ async function updateOrderStatus(orderId) {
 
         const response =
             await fetch(
-                `https://shahanaaz-production.up.railway.app/api/admin/orders/${orderId}`,
+                `https://shahanaaz-production-4093.up.railway.app/api/admin/orders/${orderId}`,
                 {
                     method: "PUT",
 
@@ -1009,7 +1009,7 @@ async function saveProduct() {
 
             response =
                 await fetch(
-                    `https://shahanaaz-production.up.railway.app/api/admin/products/${editingProductId}`,
+                    `https://shahanaaz-production-4093.up.railway.app/api/admin/products/${editingProductId}`,
                     {
                         method: "PUT",
 
@@ -1043,7 +1043,7 @@ async function saveProduct() {
 
             response =
                 await fetch(
-                    "https://shahanaaz-production.up.railway.app/api/products",
+                    "https://shahanaaz-production-4093.up.railway.app/api/products",
                     {
                         method: "POST",
 
@@ -1135,7 +1135,7 @@ async function deleteProduct(productId) {
 
         const response =
             await fetch(
-                `https://shahanaaz-production.up.railway.app/api/admin/products/${productId}`,
+                `https://shahanaaz-production-4093.up.railway.app/api/admin/products/${productId}`,
                 {
                     method: "DELETE"
                 }

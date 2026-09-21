@@ -56,7 +56,7 @@ if (buyerLoginForm) {
             try {
 
                 const response = await fetch(
-                    "https://shahanaaz-production.up.railway.app/api/login",
+                    "https://shahanaaz-production-4093.up.railway.app/api/login",
                     {
                         method: "POST",
 
@@ -144,7 +144,7 @@ if (registerForm) {
             try {
 
                 const response = await fetch(
-                    "https://shahanaaz-production.up.railway.app/api/register",
+                    "https://shahanaaz-production-4093.up.railway.app/api/register",
                     {
                         method: "POST",
 
@@ -274,7 +274,7 @@ async function addToCart(productId) {
     try {
 
         const response = await fetch(
-            "https://shahanaaz-production.up.railway.app/api/cart",
+            "https://shahanaaz-production-4093.up.railway.app/api/cart",
             {
                 method: "POST",
 
