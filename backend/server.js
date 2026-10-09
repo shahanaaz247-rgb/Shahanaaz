@@ -23,13 +23,19 @@ app.use(cors({
 
 app.use(express.json());
 
-// ================= IMAGE UPLOAD =================
+// ================= IMAGE UPLOAD & SERVING =================
 
 const frontendPath = path.join(__dirname, "..");
-const imagePath = path.join(__dirname, "../image");
 
-if (!fs.existsSync(imagePath)) {
-    fs.mkdirSync(imagePath, { recursive: true });
+// Support existing image folders and seller uploads.
+const imagePath = path.join(frontendPath, "image");
+const imagesPath = path.join(frontendPath, "images");
+const backendImagesPath = path.join(__dirname, "images");
+
+for (const folder of [imagePath, imagesPath, backendImagesPath]) {
+    if (!fs.existsSync(folder)) {
+        fs.mkdirSync(folder, { recursive: true });
+    }
 }
 
 const storage = multer.diskStorage({
@@ -37,13 +43,27 @@ const storage = multer.diskStorage({
         cb(null, imagePath);
     },
     filename: (req, file, cb) => {
-        cb(null, Date.now() + "-" + file.originalname);
+        const safeName = path.basename(file.originalname);
+        cb(null, Date.now() + "-" + safeName);
     }
 });
 
 const upload = multer({ storage });
 
+// Serve images from all supported locations.
+// Express checks these directories in order.
+app.use("/images", express.static(imagesPath));
 app.use("/images", express.static(imagePath));
+app.use("/images", express.static(backendImagesPath));
+
+// Also serve existing frontend static files.
+app.use(express.static(frontendPath));
+
+// ================= HOME =================
+
+app.get("/", (req, res) => {
+    res.send("Shahanaaz Mart Backend is running!");
+});
 
 // ================= LOGIN =================
 
@@ -58,7 +78,7 @@ app.post("/api/login", (req, res) => {
 
     db.query(sql, [email, password], (err, results) => {
         if (err) {
-            console.error(err);
+            console.error("Login error:", err);
             return res.status(500).json({
                 message: "Database error"
             });
@@ -95,7 +115,7 @@ app.post("/api/register", (req, res) => {
                 });
             }
 
-            console.error(err);
+            console.error("Registration error:", err);
             return res.status(500).json({
                 message: "Registration failed"
             });
@@ -125,7 +145,7 @@ app.post("/api/seller/register", (req, res) => {
                 });
             }
 
-            console.error(err);
+            console.error("Seller registration error:", err);
             return res.status(500).json({
                 message: "Seller registration failed"
             });
@@ -172,7 +192,7 @@ app.get("/api/products/seller/:seller_id", (req, res) => {
 
     db.query(sql, [seller_id], (err, results) => {
         if (err) {
-            console.error(err);
+            console.error("Seller products error:", err);
             return res.status(500).json({
                 message: "Failed to load seller products"
             });
@@ -184,45 +204,42 @@ app.get("/api/products/seller/:seller_id", (req, res) => {
 
 // ================= ADD PRODUCT =================
 
-app.post(
-    "/api/products",
-    upload.single("image"),
-    (req, res) => {
-        const {
-            name,
-            category,
-            price,
-            stock,
-            seller_id
-        } = req.body;
+app.post("/api/products", upload.single("image"), (req, res) => {
+    const {
+        name,
+        category,
+        price,
+        stock,
+        seller_id
+    } = req.body;
 
-        const image = req.file ? req.file.filename : null;
+    const image = req.file ? req.file.filename : null;
 
-        const sql = `
-            INSERT INTO products
-            (seller_id, name, category, price, stock, image)
-            VALUES (?, ?, ?, ?, ?, ?)
-        `;
+    const sql = `
+        INSERT INTO products
+        (seller_id, name, category, price, stock, image)
+        VALUES (?, ?, ?, ?, ?, ?)
+    `;
 
-        db.query(
-            sql,
-            [seller_id, name, category, price, stock, image],
-            (err, result) => {
-                if (err) {
-                    console.error(err);
-                    return res.status(500).json({
-                        message: "Failed to add product"
-                    });
-                }
-
-                res.json({
-                    message: "Product added successfully",
-                    product_id: result.insertId
+    db.query(
+        sql,
+        [seller_id, name, category, price, stock, image],
+        (err, result) => {
+            if (err) {
+                console.error("Add product error:", err);
+                return res.status(500).json({
+                    message: "Failed to add product"
                 });
             }
-        );
-    }
-);
+
+            res.json({
+                message: "Product added successfully",
+                product_id: result.insertId,
+                image
+            });
+        }
+    );
+});
 
 // ================= SELLER EDIT PRODUCT =================
 
@@ -673,6 +690,7 @@ app.post("/api/orders", (req, res) => {
                                                 message: "Failed to save order items"
                                             });
                                         }
+
                                         return;
                                     }
 
@@ -820,14 +838,6 @@ app.put("/api/admin/orders/:order_id", (req, res) => {
             message: "Order status updated successfully"
         });
     });
-});
-
-// ================= FRONTEND STATIC FILES =================
-
-app.use(express.static(frontendPath));
-
-app.get("/", (req, res) => {
-    res.send("Shahanaaz Mart Backend is running!");
 });
 
 // ================= SERVER =================
