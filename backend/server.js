@@ -136,11 +136,14 @@ app.get("/api/products", (req, res) => {
     `;
 
     db.query(sql, (err, results) => {
+        
         if (err) {
-            return res.status(500).json({
-                message: "Failed to load products"
-            });
-        }
+          console.error("Products query error:", err);
+
+         return res.status(500).json({
+          message: "Failed to load products"
+          });
+         }
 
         res.json(results);
     });
@@ -913,12 +916,9 @@ app.use(
     express.static(frontendPath)
 );
 
-// ================= HOME =================
 
 app.get("/", (req, res) => {
-    res.sendFile(
-        path.join(frontendPath, "index.html")
-    );
+    res.send("Shahanaaz Mart Backend is running!");
 });
 
 // ================= SERVER =================
