@@ -7,7 +7,6 @@
     <title>Home | Shahanaaz Mart</title>
     <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <header class="shop-header">
@@ -33,22 +32,18 @@
 </header>
 
 <main>
-
     <section class="shop-hero">
         <div class="hero-content">
             <p class="eyebrow">WELCOME TO SHAHANAAZ MART</p>
-
             <h1>
                 Find something
                 <span>worth bringing home.</span>
             </h1>
-
             <p>
                 Explore carefully selected products
                 across fashion, electronics, home
                 essentials, beauty and more.
             </p>
-
             <button class="shop-now-button" onclick="scrollToProducts()">
                 Shop Now →
             </button>
@@ -56,13 +51,11 @@
 
         <div class="hero-visual">
             <div class="hero-circle"></div>
-
             <div class="hero-product-card">
                 <span>✦</span>
                 <strong>Fresh Finds</strong>
                 <small>New collections are here</small>
             </div>
-
             <div class="floating-tag">New Arrivals</div>
         </div>
     </section>
@@ -135,24 +128,20 @@
     <section class="offer-section" id="offers">
         <div>
             <p class="eyebrow">LIMITED TIME</p>
-
             <h2>
                 A little more value,
                 <span>a lot more to explore.</span>
             </h2>
-
             <p>
                 Discover selected products and
                 special offers available on
                 Shahanaaz Mart.
             </p>
-
             <button onclick="scrollToProducts()">Explore Offers →</button>
         </div>
 
         <div class="offer-symbol">%</div>
     </section>
-
 </main>
 
 <footer class="shop-footer">
@@ -172,6 +161,10 @@
 <script>
 const API_BASE = "https://extraordinary-warmth-production-bf36.up.railway.app";
 
+const FRONTEND_IMAGE_BASE =
+    "https://mellifluous-boba-d2762a.netlify.app/image/";
+
+// Supports full URLs, images/filename.jpg and filename.jpg.
 function getProductImageUrl(image) {
     if (!image || typeof image !== "string") {
         return "";
@@ -179,23 +172,20 @@ function getProductImageUrl(image) {
 
     const value = image.trim();
 
-    // Already a complete image URL
     if (/^https?:\/\//i.test(value)) {
         return value;
     }
 
-    // Handle stored paths such as /images/tshirt.jpg
-    if (value.startsWith("/")) {
-        return API_BASE + value;
+    const fileName = value
+        .replace(/^\/+/, "")
+        .replace(/^(images|image)\//i, "");
+
+    if (!fileName || fileName.includes("..")) {
+        return "";
     }
 
-    // Handle stored paths such as images/tshirt.jpg
-    if (value.startsWith("images/")) {
-        return API_BASE + "/" + value;
-    }
-
-    // Handle filenames such as headphone.jpg
-    return API_BASE + "/images/" + value;
+    // Existing images are served from the Netlify image folder.
+    return FRONTEND_IMAGE_BASE + encodeURIComponent(fileName);
 }
 
 async function loadProducts() {
@@ -238,6 +228,12 @@ async function loadProducts() {
             img.style.objectFit = "cover";
             img.style.borderRadius = "inherit";
 
+            const wishlistButton = document.createElement("button");
+            wishlistButton.className = "wishlist-button";
+            wishlistButton.textContent = "♡";
+            wishlistButton.type = "button";
+            wishlistButton.onclick = () => showDemoMessage("Wishlist");
+
             if (imageUrl) {
                 img.src = imageUrl;
 
@@ -245,7 +241,7 @@ async function loadProducts() {
                     console.error(
                         "Product image failed to load:",
                         product.name,
-                        this.src
+                        imageUrl
                     );
 
                     this.onerror = null;
@@ -258,16 +254,22 @@ async function loadProducts() {
                         "width:100%;height:100%;min-height:160px;" +
                         "color:#777;font-size:14px;";
 
-                    imageContainer.insertBefore(placeholder, wishlistButton);
+                    imageContainer.insertBefore(
+                        placeholder,
+                        wishlistButton
+                    );
                 };
             } else {
                 img.style.display = "none";
-            }
 
-            const wishlistButton = document.createElement("button");
-            wishlistButton.className = "wishlist-button";
-            wishlistButton.textContent = "♡";
-            wishlistButton.onclick = () => showDemoMessage("Wishlist");
+                const placeholder = document.createElement("div");
+                placeholder.textContent = "📦 No image available";
+                placeholder.style.cssText =
+                    "display:flex;align-items:center;justify-content:center;" +
+                    "width:100%;height:100%;min-height:160px;color:#777;";
+
+                imageContainer.appendChild(placeholder);
+            }
 
             imageContainer.appendChild(img);
             imageContainer.appendChild(wishlistButton);
@@ -302,6 +304,7 @@ async function loadProducts() {
             const cartButton = document.createElement("button");
             cartButton.className = "cart-button";
             cartButton.textContent = "Add to Cart";
+            cartButton.type = "button";
             cartButton.onclick = () => addToCart(product.product_id);
 
             info.appendChild(category);
@@ -318,14 +321,11 @@ async function loadProducts() {
 
     } catch (error) {
         console.error("Product loading error:", error);
-
-        productGrid.innerHTML = `
-            <p>Unable to load products. Please try again.</p>
-        `;
+        productGrid.innerHTML =
+            "<p>Unable to load products. Please try again.</p>";
     }
 }
 
-/* Add Product To Cart */
 async function addToCart(productId) {
     const userId = localStorage.getItem("user_id");
 
