@@ -1,3 +1,4 @@
+
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
@@ -6,9 +7,23 @@ const fs = require("fs");
 const db = require("./db");
 
 const app = express();
+const PORT = process.env.PORT || 5000;
 
-app.use(cors());
+// ================= CORS =================
+
+app.use(cors({
+    origin: [
+        "https://mellifluous-boba-d2762a.netlify.app",
+        "https://renewed-imagination-production-93ec.up.railway.app"
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    optionsSuccessStatus: 204
+}));
+
 app.use(express.json());
+
+// ================= IMAGE UPLOAD =================
 
 const frontendPath = path.join(__dirname, "..");
 const imagePath = path.join(__dirname, "../image");
@@ -21,18 +36,14 @@ const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, imagePath);
     },
-
     filename: (req, file, cb) => {
         cb(null, Date.now() + "-" + file.originalname);
     }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 
-app.use(
-    "/images",
-    express.static(imagePath)
-);
+app.use("/images", express.static(imagePath));
 
 // ================= LOGIN =================
 
@@ -72,8 +83,7 @@ app.post("/api/register", (req, res) => {
     const { name, email, password } = req.body;
 
     const sql = `
-        INSERT INTO users
-        (name, email, password, role)
+        INSERT INTO users (name, email, password, role)
         VALUES (?, ?, ?, 'buyer')
     `;
 
@@ -85,6 +95,7 @@ app.post("/api/register", (req, res) => {
                 });
             }
 
+            console.error(err);
             return res.status(500).json({
                 message: "Registration failed"
             });
@@ -102,8 +113,7 @@ app.post("/api/seller/register", (req, res) => {
     const { name, email, password } = req.body;
 
     const sql = `
-        INSERT INTO users
-        (name, email, password, role)
+        INSERT INTO users (name, email, password, role)
         VALUES (?, ?, ?, 'seller')
     `;
 
@@ -115,6 +125,7 @@ app.post("/api/seller/register", (req, res) => {
                 });
             }
 
+            console.error(err);
             return res.status(500).json({
                 message: "Seller registration failed"
             });
@@ -136,14 +147,12 @@ app.get("/api/products", (req, res) => {
     `;
 
     db.query(sql, (err, results) => {
-        
         if (err) {
-          console.error("Products query error:", err);
-
-         return res.status(500).json({
-          message: "Failed to load products"
-          });
-         }
+            console.error("Products query error:", err);
+            return res.status(500).json({
+                message: "Failed to load products"
+            });
+        }
 
         res.json(results);
     });
@@ -163,6 +172,7 @@ app.get("/api/products/seller/:seller_id", (req, res) => {
 
     db.query(sql, [seller_id], (err, results) => {
         if (err) {
+            console.error(err);
             return res.status(500).json({
                 message: "Failed to load seller products"
             });
@@ -186,9 +196,7 @@ app.post(
             seller_id
         } = req.body;
 
-        const image = req.file
-            ? req.file.filename
-            : null;
+        const image = req.file ? req.file.filename : null;
 
         const sql = `
             INSERT INTO products
@@ -198,18 +206,10 @@ app.post(
 
         db.query(
             sql,
-            [
-                seller_id,
-                name,
-                category,
-                price,
-                stock,
-                image
-            ],
+            [seller_id, name, category, price, stock, image],
             (err, result) => {
                 if (err) {
                     console.error(err);
-
                     return res.status(500).json({
                         message: "Failed to add product"
                     });
@@ -240,70 +240,53 @@ app.put("/api/products/:product_id", (req, res) => {
     const checkSql = `
         SELECT *
         FROM products
-        WHERE product_id = ?
-        AND seller_id = ?
+        WHERE product_id = ? AND seller_id = ?
     `;
 
-    db.query(
-        checkSql,
-        [product_id, seller_id],
-        (err, results) => {
-            if (err) {
-                return res.status(500).json({
-                    message: "Database error"
-                });
-            }
+    db.query(checkSql, [product_id, seller_id], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({
+                message: "Database error"
+            });
+        }
 
-            if (results.length === 0) {
-                return res.status(404).json({
-                    message: "Invalid product or seller"
-                });
-            }
+        if (results.length === 0) {
+            return res.status(404).json({
+                message: "Invalid product or seller"
+            });
+        }
 
-            const updateSql = `
-                UPDATE products
-                SET name = ?,
-                    category = ?,
-                    price = ?,
-                    stock = ?
-                WHERE product_id = ?
-                AND seller_id = ?
-            `;
+        const updateSql = `
+            UPDATE products
+            SET name = ?, category = ?, price = ?, stock = ?
+            WHERE product_id = ? AND seller_id = ?
+        `;
 
-            db.query(
-                updateSql,
-                [
-                    name,
-                    category,
-                    price,
-                    stock,
-                    product_id,
-                    seller_id
-                ],
-                (err) => {
-                    if (err) {
-                        return res.status(500).json({
-                            message: "Failed to update product"
-                        });
-                    }
-
-                    res.json({
-                        message: "Product updated successfully"
+        db.query(
+            updateSql,
+            [name, category, price, stock, product_id, seller_id],
+            (err) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).json({
+                        message: "Failed to update product"
                     });
                 }
-            );
-        }
-    );
+
+                res.json({
+                    message: "Product updated successfully"
+                });
+            }
+        );
+    });
 });
 
 // ================= SELLER DELETE PRODUCT =================
 
 app.delete("/api/products/:product_id", (req, res) => {
     const product_id = Number(req.params.product_id);
-
-    const seller_id = req.body
-        ? Number(req.body.seller_id)
-        : null;
+    const seller_id = req.body ? Number(req.body.seller_id) : null;
 
     if (!seller_id) {
         return res.status(400).json({
@@ -314,49 +297,41 @@ app.delete("/api/products/:product_id", (req, res) => {
     const checkSql = `
         SELECT *
         FROM products
-        WHERE product_id = ?
-        AND seller_id = ?
+        WHERE product_id = ? AND seller_id = ?
     `;
 
-    db.query(
-        checkSql,
-        [product_id, seller_id],
-        (err, results) => {
-            if (err) {
-                return res.status(500).json({
-                    message: "Database error"
-                });
-            }
-
-            if (results.length === 0) {
-                return res.status(404).json({
-                    message: "Invalid product or seller"
-                });
-            }
-
-            const deleteSql = `
-                DELETE FROM products
-                WHERE product_id = ?
-                AND seller_id = ?
-            `;
-
-            db.query(
-                deleteSql,
-                [product_id, seller_id],
-                (err) => {
-                    if (err) {
-                        return res.status(500).json({
-                            message: "Failed to delete product"
-                        });
-                    }
-
-                    res.json({
-                        message: "Product deleted successfully"
-                    });
-                }
-            );
+    db.query(checkSql, [product_id, seller_id], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({
+                message: "Database error"
+            });
         }
-    );
+
+        if (results.length === 0) {
+            return res.status(404).json({
+                message: "Invalid product or seller"
+            });
+        }
+
+        const deleteSql = `
+            DELETE FROM products
+            WHERE product_id = ? AND seller_id = ?
+        `;
+
+        db.query(deleteSql, [product_id, seller_id], (err) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({
+                    message: "Failed to delete product"
+                });
+            }
+
+            res.json({
+                message: "Product deleted successfully"
+            });
+        });
+    });
 });
 
 // ================= ADMIN EDIT PRODUCT =================
@@ -374,26 +349,16 @@ app.put("/api/admin/products/:product_id", (req, res) => {
 
     const sql = `
         UPDATE products
-        SET name = ?,
-            category = ?,
-            price = ?,
-            stock = ?,
-            seller_id = ?
+        SET name = ?, category = ?, price = ?, stock = ?, seller_id = ?
         WHERE product_id = ?
     `;
 
     db.query(
         sql,
-        [
-            name,
-            category,
-            price,
-            stock,
-            seller_id,
-            product_id
-        ],
+        [name, category, price, stock, seller_id, product_id],
         (err, result) => {
             if (err) {
+                console.error(err);
                 return res.status(500).json({
                     message: "Failed to update product"
                 });
@@ -429,11 +394,11 @@ app.delete("/api/admin/products/:product_id", (req, res) => {
                 err.code === "ER_ROW_IS_REFERENCED"
             ) {
                 return res.status(409).json({
-                    message:
-                        "This product is already used in cart or orders and cannot be deleted."
+                    message: "This product is already used in cart or orders and cannot be deleted."
                 });
             }
 
+            console.error(err);
             return res.status(500).json({
                 message: "Failed to delete product"
             });
@@ -448,91 +413,72 @@ app.delete("/api/admin/products/:product_id", (req, res) => {
 // ================= ADD TO CART =================
 
 app.post("/api/cart", (req, res) => {
-    const {
-        user_id,
-        product_id,
-        quantity
-    } = req.body;
+    const { user_id, product_id, quantity } = req.body;
 
     const checkSql = `
         SELECT *
         FROM cart
-        WHERE user_id = ?
-        AND product_id = ?
+        WHERE user_id = ? AND product_id = ?
     `;
 
-    db.query(
-        checkSql,
-        [user_id, product_id],
-        (err, results) => {
-            if (err) {
-                return res.status(500).json({
-                    message: "Database error"
-                });
-            }
-
-            if (results.length > 0) {
-                const newQuantity =
-                    results[0].quantity +
-                    Number(quantity);
-
-                const updateSql = `
-                    UPDATE cart
-                    SET quantity = ?
-                    WHERE cart_id = ?
-                `;
-
-                db.query(
-                    updateSql,
-                    [
-                        newQuantity,
-                        results[0].cart_id
-                    ],
-                    (err) => {
-                        if (err) {
-                            return res.status(500).json({
-                                message:
-                                    "Failed to update cart"
-                            });
-                        }
-
-                        res.json({
-                            message:
-                                "Cart updated successfully"
-                        });
-                    }
-                );
-            } else {
-                const insertSql = `
-                    INSERT INTO cart
-                    (user_id, product_id, quantity)
-                    VALUES (?, ?, ?)
-                `;
-
-                db.query(
-                    insertSql,
-                    [
-                        user_id,
-                        product_id,
-                        quantity
-                    ],
-                    (err) => {
-                        if (err) {
-                            return res.status(500).json({
-                                message:
-                                    "Failed to add to cart"
-                            });
-                        }
-
-                        res.json({
-                            message:
-                                "Product added to cart"
-                        });
-                    }
-                );
-            }
+    db.query(checkSql, [user_id, product_id], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({
+                message: "Database error"
+            });
         }
-    );
+
+        if (results.length > 0) {
+            const newQuantity =
+                results[0].quantity + Number(quantity);
+
+            const updateSql = `
+                UPDATE cart
+                SET quantity = ?
+                WHERE cart_id = ?
+            `;
+
+            db.query(
+                updateSql,
+                [newQuantity, results[0].cart_id],
+                (err) => {
+                    if (err) {
+                        console.error(err);
+                        return res.status(500).json({
+                            message: "Failed to update cart"
+                        });
+                    }
+
+                    res.json({
+                        message: "Cart updated successfully"
+                    });
+                }
+            );
+        } else {
+            const insertSql = `
+                INSERT INTO cart (user_id, product_id, quantity)
+                VALUES (?, ?, ?)
+            `;
+
+            db.query(
+                insertSql,
+                [user_id, product_id, quantity],
+                (err) => {
+                    if (err) {
+                        console.error(err);
+                        return res.status(500).json({
+                            message: "Failed to add to cart"
+                        });
+                    }
+
+                    res.json({
+                        message: "Product added to cart"
+                    });
+                }
+            );
+        }
+    });
 });
 
 // ================= GET CART =================
@@ -550,13 +496,13 @@ app.get("/api/cart/:user_id", (req, res) => {
             products.image,
             products.stock
         FROM cart
-        JOIN products
-        ON cart.product_id = products.product_id
+        JOIN products ON cart.product_id = products.product_id
         WHERE cart.user_id = ?
     `;
 
     db.query(sql, [user_id], (err, results) => {
         if (err) {
+            console.error(err);
             return res.status(500).json({
                 message: "Failed to load cart"
             });
@@ -584,23 +530,18 @@ app.put("/api/cart/:cart_id", (req, res) => {
         WHERE cart_id = ?
     `;
 
-    db.query(
-        sql,
-        [quantity, cart_id],
-        (err) => {
-            if (err) {
-                return res.status(500).json({
-                    message:
-                        "Failed to update cart"
-                });
-            }
-
-            res.json({
-                message:
-                    "Cart updated successfully"
+    db.query(sql, [quantity, cart_id], (err) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({
+                message: "Failed to update cart"
             });
         }
-    );
+
+        res.json({
+            message: "Cart updated successfully"
+        });
+    });
 });
 
 // ================= DELETE CART =================
@@ -615,15 +556,14 @@ app.delete("/api/cart/:cart_id", (req, res) => {
 
     db.query(sql, [cart_id], (err) => {
         if (err) {
+            console.error(err);
             return res.status(500).json({
-                message:
-                    "Failed to remove cart item"
+                message: "Failed to remove cart item"
             });
         }
 
         res.json({
-            message:
-                "Item removed from cart"
+            message: "Item removed from cart"
         });
     });
 });
@@ -652,23 +592,16 @@ app.post("/api/orders", (req, res) => {
 
     db.query(
         orderSql,
-        [
-            user_id,
-            total_amount,
-            address
-        ],
+        [user_id, total_amount, address],
         (err, orderResult) => {
             if (err) {
                 console.error(err);
-
                 return res.status(500).json({
-                    message:
-                        "Failed to create order"
+                    message: "Failed to create order"
                 });
             }
 
-            const order_id =
-                orderResult.insertId;
+            const order_id = orderResult.insertId;
 
             const paymentSql = `
                 INSERT INTO payments
@@ -686,101 +619,92 @@ app.post("/api/orders", (req, res) => {
                 [
                     order_id,
                     total_amount,
-                    payment_method ||
-                        "Cash on Delivery"
+                    payment_method || "Cash on Delivery"
                 ],
                 (err) => {
                     if (err) {
                         console.error(err);
-
                         return res.status(500).json({
-                            message:
-                                "Payment record failed"
+                            message: "Payment record failed"
                         });
                     }
 
                     const cartSql = `
-                        SELECT
-                            product_id,
-                            quantity
+                        SELECT product_id, quantity
                         FROM cart
                         WHERE user_id = ?
                     `;
 
-                    db.query(
-                        cartSql,
-                        [user_id],
-                        (err, cartItems) => {
-                            if (err) {
-                                return res.status(500).json({
-                                    message:
-                                        "Failed to get cart"
-                                });
-                            }
+                    db.query(cartSql, [user_id], (err, cartItems) => {
+                        if (err) {
+                            console.error(err);
+                            return res.status(500).json({
+                                message: "Failed to get cart"
+                            });
+                        }
 
-                            if (
-                                cartItems.length === 0
-                            ) {
-                                return res.json({
-                                    message:
-                                        "Order created successfully",
-                                    order_id:
-                                        order_id
-                                });
-                            }
+                        if (cartItems.length === 0) {
+                            return res.json({
+                                message: "Order created successfully",
+                                order_id
+                            });
+                        }
 
-                            let completed = 0;
+                        let completed = 0;
+                        let failed = false;
 
-                            cartItems.forEach(
-                                item => {
-                                    const itemSql = `
-                                        INSERT INTO order_items
-                                        (
-                                            order_id,
-                                            product_id,
-                                            quantity
-                                        )
-                                        VALUES (?, ?, ?)
-                                    `;
+                        cartItems.forEach((item) => {
+                            const itemSql = `
+                                INSERT INTO order_items
+                                (order_id, product_id, quantity)
+                                VALUES (?, ?, ?)
+                            `;
 
-                                    db.query(
-                                        itemSql,
-                                        [
-                                            order_id,
-                                            item.product_id,
-                                            item.quantity
-                                        ],
-                                        () => {
-                                            completed++;
+                            db.query(
+                                itemSql,
+                                [order_id, item.product_id, item.quantity],
+                                (itemErr) => {
+                                    if (itemErr) {
+                                        console.error(itemErr);
 
-                                            if (
-                                                completed ===
-                                                cartItems.length
-                                            ) {
-                                                const clearSql = `
-                                                    DELETE FROM cart
-                                                    WHERE user_id = ?
-                                                `;
-
-                                                db.query(
-                                                    clearSql,
-                                                    [user_id],
-                                                    () => {
-                                                        res.json({
-                                                            message:
-                                                                "Order placed successfully",
-                                                            order_id:
-                                                                order_id
-                                                        });
-                                                    }
-                                                );
-                                            }
+                                        if (!failed) {
+                                            failed = true;
+                                            return res.status(500).json({
+                                                message: "Failed to save order items"
+                                            });
                                         }
-                                    );
+                                        return;
+                                    }
+
+                                    completed++;
+
+                                    if (
+                                        completed === cartItems.length &&
+                                        !failed
+                                    ) {
+                                        const clearSql = `
+                                            DELETE FROM cart
+                                            WHERE user_id = ?
+                                        `;
+
+                                        db.query(clearSql, [user_id], (clearErr) => {
+                                            if (clearErr) {
+                                                console.error(clearErr);
+                                                return res.status(500).json({
+                                                    message: "Order created but cart could not be cleared"
+                                                });
+                                            }
+
+                                            res.json({
+                                                message: "Order placed successfully",
+                                                order_id
+                                            });
+                                        });
+                                    }
                                 }
                             );
-                        }
-                    );
+                        });
+                    });
                 }
             );
         }
@@ -801,9 +725,9 @@ app.get("/api/orders/:user_id", (req, res) => {
 
     db.query(sql, [user_id], (err, results) => {
         if (err) {
+            console.error(err);
             return res.status(500).json({
-                message:
-                    "Failed to load orders"
+                message: "Failed to load orders"
             });
         }
 
@@ -815,20 +739,16 @@ app.get("/api/orders/:user_id", (req, res) => {
 
 app.get("/api/admin/users", (req, res) => {
     const sql = `
-        SELECT
-            user_id,
-            name,
-            email,
-            role
+        SELECT user_id, name, email, role
         FROM users
         ORDER BY user_id DESC
     `;
 
     db.query(sql, (err, results) => {
         if (err) {
+            console.error(err);
             return res.status(500).json({
-                message:
-                    "Failed to load users"
+                message: "Failed to load users"
             });
         }
 
@@ -847,9 +767,9 @@ app.get("/api/admin/orders", (req, res) => {
 
     db.query(sql, (err, results) => {
         if (err) {
+            console.error(err);
             return res.status(500).json({
-                message:
-                    "Failed to load orders"
+                message: "Failed to load orders"
             });
         }
 
@@ -882,40 +802,29 @@ app.put("/api/admin/orders/:order_id", (req, res) => {
         WHERE order_id = ?
     `;
 
-    db.query(
-        sql,
-        [order_status, order_id],
-        (err, result) => {
-            if (err) {
-                console.error(err);
-
-                return res.status(500).json({
-                    message:
-                        "Failed to update order status"
-                });
-            }
-
-            if (result.affectedRows === 0) {
-                return res.status(404).json({
-                    message:
-                        "Order not found"
-                });
-            }
-
-            res.json({
-                message:
-                    "Order status updated successfully"
+    db.query(sql, [order_status, order_id], (err, result) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({
+                message: "Failed to update order status"
             });
         }
-    );
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                message: "Order not found"
+            });
+        }
+
+        res.json({
+            message: "Order status updated successfully"
+        });
+    });
 });
 
-// ================= FRONTEND =================
+// ================= FRONTEND STATIC FILES =================
 
-app.use(
-    express.static(frontendPath)
-);
-
+app.use(express.static(frontendPath));
 
 app.get("/", (req, res) => {
     res.send("Shahanaaz Mart Backend is running!");
@@ -923,10 +832,6 @@ app.get("/", (req, res) => {
 
 // ================= SERVER =================
 
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-    console.log(
-        `Server running on port ${PORT}`
-    );
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on port ${PORT}`);
 });
