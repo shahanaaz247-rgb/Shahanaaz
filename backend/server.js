@@ -9,12 +9,9 @@ const db = require("./db");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ================= CORS =================
-
 app.use(cors({
     origin: [
-        "https://mellifluous-boba-d2762a.netlify.app",
-        "https://renewed-imagination-production-93ec.up.railway.app"
+        "https://mellifluous-boba-d2762a.netlify.app"
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -23,16 +20,19 @@ app.use(cors({
 
 app.use(express.json());
 
+
 // ================= IMAGE UPLOAD & SERVING =================
 
 const frontendPath = path.join(__dirname, "..");
-
-// Support existing image folders and seller uploads.
 const imagePath = path.join(frontendPath, "image");
 const imagesPath = path.join(frontendPath, "images");
 const backendImagesPath = path.join(__dirname, "images");
 
-for (const folder of [imagePath, imagesPath, backendImagesPath]) {
+for (const folder of [
+    imagePath,
+    imagesPath,
+    backendImagesPath
+]) {
     if (!fs.existsSync(folder)) {
         fs.mkdirSync(folder, { recursive: true });
     }
@@ -50,20 +50,18 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Serve images from all supported locations.
-// Express checks these directories in order.
 app.use("/images", express.static(imagesPath));
 app.use("/images", express.static(imagePath));
 app.use("/images", express.static(backendImagesPath));
+app.use("/image", express.static(imagePath));
 
-// Also serve existing frontend static files.
-app.use(express.static(frontendPath));
 
 // ================= HOME =================
 
 app.get("/", (req, res) => {
     res.send("Shahanaaz Mart Backend is running!");
 });
+
 
 // ================= LOGIN =================
 
@@ -97,6 +95,7 @@ app.post("/api/login", (req, res) => {
     });
 });
 
+
 // ================= BUYER REGISTER =================
 
 app.post("/api/register", (req, res) => {
@@ -126,6 +125,7 @@ app.post("/api/register", (req, res) => {
         });
     });
 });
+
 
 // ================= SELLER REGISTER =================
 
@@ -157,6 +157,7 @@ app.post("/api/seller/register", (req, res) => {
     });
 });
 
+
 // ================= GET ALL PRODUCTS =================
 
 app.get("/api/products", (req, res) => {
@@ -177,6 +178,7 @@ app.get("/api/products", (req, res) => {
         res.json(results);
     });
 });
+
 
 // ================= SELLER PRODUCTS =================
 
@@ -201,6 +203,7 @@ app.get("/api/products/seller/:seller_id", (req, res) => {
         res.json(results);
     });
 });
+
 
 // ================= ADD PRODUCT =================
 
@@ -240,6 +243,7 @@ app.post("/api/products", upload.single("image"), (req, res) => {
         }
     );
 });
+
 
 // ================= SELLER EDIT PRODUCT =================
 
@@ -299,11 +303,12 @@ app.put("/api/products/:product_id", (req, res) => {
     });
 });
 
+
 // ================= SELLER DELETE PRODUCT =================
 
 app.delete("/api/products/:product_id", (req, res) => {
     const product_id = Number(req.params.product_id);
-    const seller_id = req.body ? Number(req.body.seller_id) : null;
+    const seller_id = Number(req.body?.seller_id);
 
     if (!seller_id) {
         return res.status(400).json({
@@ -351,6 +356,7 @@ app.delete("/api/products/:product_id", (req, res) => {
     });
 });
 
+
 // ================= ADMIN EDIT PRODUCT =================
 
 app.put("/api/admin/products/:product_id", (req, res) => {
@@ -394,6 +400,7 @@ app.put("/api/admin/products/:product_id", (req, res) => {
     );
 });
 
+
 // ================= ADMIN DELETE PRODUCT =================
 
 app.delete("/api/admin/products/:product_id", (req, res) => {
@@ -427,6 +434,7 @@ app.delete("/api/admin/products/:product_id", (req, res) => {
     });
 });
 
+
 // ================= ADD TO CART =================
 
 app.post("/api/cart", (req, res) => {
@@ -448,7 +456,7 @@ app.post("/api/cart", (req, res) => {
 
         if (results.length > 0) {
             const newQuantity =
-                results[0].quantity + Number(quantity);
+                Number(results[0].quantity) + Number(quantity);
 
             const updateSql = `
                 UPDATE cart
@@ -498,6 +506,7 @@ app.post("/api/cart", (req, res) => {
     });
 });
 
+
 // ================= GET CART =================
 
 app.get("/api/cart/:user_id", (req, res) => {
@@ -528,6 +537,7 @@ app.get("/api/cart/:user_id", (req, res) => {
         res.json(results);
     });
 });
+
 
 // ================= UPDATE CART =================
 
@@ -561,6 +571,7 @@ app.put("/api/cart/:cart_id", (req, res) => {
     });
 });
 
+
 // ================= DELETE CART =================
 
 app.delete("/api/cart/:cart_id", (req, res) => {
@@ -585,6 +596,7 @@ app.delete("/api/cart/:cart_id", (req, res) => {
     });
 });
 
+
 // ================= CREATE ORDER =================
 
 app.post("/api/orders", (req, res) => {
@@ -597,13 +609,7 @@ app.post("/api/orders", (req, res) => {
 
     const orderSql = `
         INSERT INTO orders
-        (
-            user_id,
-            total_amount,
-            address,
-            payment_status,
-            order_status
-        )
+        (user_id, total_amount, address, payment_status, order_status)
         VALUES (?, ?, ?, 'Pending', 'Placed')
     `;
 
@@ -622,12 +628,7 @@ app.post("/api/orders", (req, res) => {
 
             const paymentSql = `
                 INSERT INTO payments
-                (
-                    order_id,
-                    amount,
-                    payment_method,
-                    payment_status
-                )
+                (order_id, amount, payment_method, payment_status)
                 VALUES (?, ?, ?, 'Pending')
             `;
 
@@ -705,19 +706,23 @@ app.post("/api/orders", (req, res) => {
                                             WHERE user_id = ?
                                         `;
 
-                                        db.query(clearSql, [user_id], (clearErr) => {
-                                            if (clearErr) {
-                                                console.error(clearErr);
-                                                return res.status(500).json({
-                                                    message: "Order created but cart could not be cleared"
+                                        db.query(
+                                            clearSql,
+                                            [user_id],
+                                            (clearErr) => {
+                                                if (clearErr) {
+                                                    console.error(clearErr);
+                                                    return res.status(500).json({
+                                                        message: "Order created but cart could not be cleared"
+                                                    });
+                                                }
+
+                                                res.json({
+                                                    message: "Order placed successfully",
+                                                    order_id
                                                 });
                                             }
-
-                                            res.json({
-                                                message: "Order placed successfully",
-                                                order_id
-                                            });
-                                        });
+                                        );
                                     }
                                 }
                             );
@@ -728,6 +733,7 @@ app.post("/api/orders", (req, res) => {
         }
     );
 });
+
 
 // ================= USER ORDERS =================
 
@@ -753,6 +759,7 @@ app.get("/api/orders/:user_id", (req, res) => {
     });
 });
 
+
 // ================= ADMIN USERS =================
 
 app.get("/api/admin/users", (req, res) => {
@@ -774,6 +781,7 @@ app.get("/api/admin/users", (req, res) => {
     });
 });
 
+
 // ================= ADMIN ORDERS =================
 
 app.get("/api/admin/orders", (req, res) => {
@@ -794,6 +802,7 @@ app.get("/api/admin/orders", (req, res) => {
         res.json(results);
     });
 });
+
 
 // ================= ADMIN UPDATE ORDER STATUS =================
 
@@ -839,6 +848,7 @@ app.put("/api/admin/orders/:order_id", (req, res) => {
         });
     });
 });
+
 
 // ================= SERVER =================
 
