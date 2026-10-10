@@ -9,17 +9,29 @@ const db = require("./db");
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// ================= CORS =================
+
 app.use(cors({
     origin: [
-        "https://mellifluous-boba-d2762a.netlify.app"
+        "https://mellifluous-boba-d2762a.netlify.app",
+        "https://cheery-lokum-e67ece.netlify.app"
     ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: [
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "OPTIONS"
+    ],
+    allowedHeaders: [
+        "Content-Type",
+        "Authorization"
+    ],
     optionsSuccessStatus: 204
 }));
 
 app.use(express.json());
-
 
 // ================= IMAGE UPLOAD & SERVING =================
 
@@ -55,13 +67,11 @@ app.use("/images", express.static(imagePath));
 app.use("/images", express.static(backendImagesPath));
 app.use("/image", express.static(imagePath));
 
-
 // ================= HOME =================
 
 app.get("/", (req, res) => {
     res.send("Shahanaaz Mart Backend is running!");
 });
-
 
 // ================= LOGIN =================
 
@@ -95,7 +105,6 @@ app.post("/api/login", (req, res) => {
     });
 });
 
-
 // ================= BUYER REGISTER =================
 
 app.post("/api/register", (req, res) => {
@@ -125,7 +134,6 @@ app.post("/api/register", (req, res) => {
         });
     });
 });
-
 
 // ================= SELLER REGISTER =================
 
@@ -157,7 +165,6 @@ app.post("/api/seller/register", (req, res) => {
     });
 });
 
-
 // ================= GET ALL PRODUCTS =================
 
 app.get("/api/products", (req, res) => {
@@ -178,7 +185,6 @@ app.get("/api/products", (req, res) => {
         res.json(results);
     });
 });
-
 
 // ================= SELLER PRODUCTS =================
 
@@ -203,7 +209,6 @@ app.get("/api/products/seller/:seller_id", (req, res) => {
         res.json(results);
     });
 });
-
 
 // ================= ADD PRODUCT =================
 
@@ -243,7 +248,6 @@ app.post("/api/products", upload.single("image"), (req, res) => {
         }
     );
 });
-
 
 // ================= SELLER EDIT PRODUCT =================
 
@@ -303,7 +307,6 @@ app.put("/api/products/:product_id", (req, res) => {
     });
 });
 
-
 // ================= SELLER DELETE PRODUCT =================
 
 app.delete("/api/products/:product_id", (req, res) => {
@@ -341,7 +344,7 @@ app.delete("/api/products/:product_id", (req, res) => {
             WHERE product_id = ? AND seller_id = ?
         `;
 
-        db.query(deleteSql, [product_id, seller_id], (err) => {
+        db.query(sql = deleteSql, [product_id, seller_id], (err) => {
             if (err) {
                 console.error(err);
                 return res.status(500).json({
@@ -355,7 +358,6 @@ app.delete("/api/products/:product_id", (req, res) => {
         });
     });
 });
-
 
 // ================= ADMIN EDIT PRODUCT =================
 
@@ -400,7 +402,6 @@ app.put("/api/admin/products/:product_id", (req, res) => {
     );
 });
 
-
 // ================= ADMIN DELETE PRODUCT =================
 
 app.delete("/api/admin/products/:product_id", (req, res) => {
@@ -411,7 +412,7 @@ app.delete("/api/admin/products/:product_id", (req, res) => {
         WHERE product_id = ?
     `;
 
-    db.query(sql, [product_id], (err) => {
+    db.query(sql, [product_id], (err, result) => {
         if (err) {
             if (
                 err.code === "ER_ROW_IS_REFERENCED_2" ||
@@ -428,12 +429,17 @@ app.delete("/api/admin/products/:product_id", (req, res) => {
             });
         }
 
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                message: "Product not found"
+            });
+        }
+
         res.json({
             message: "Product deleted successfully"
         });
     });
 });
-
 
 // ================= ADD TO CART =================
 
@@ -506,7 +512,6 @@ app.post("/api/cart", (req, res) => {
     });
 });
 
-
 // ================= GET CART =================
 
 app.get("/api/cart/:user_id", (req, res) => {
@@ -538,7 +543,6 @@ app.get("/api/cart/:user_id", (req, res) => {
     });
 });
 
-
 // ================= UPDATE CART =================
 
 app.put("/api/cart/:cart_id", (req, res) => {
@@ -557,11 +561,17 @@ app.put("/api/cart/:cart_id", (req, res) => {
         WHERE cart_id = ?
     `;
 
-    db.query(sql, [quantity, cart_id], (err) => {
+    db.query(sql, [quantity, cart_id], (err, result) => {
         if (err) {
             console.error(err);
             return res.status(500).json({
                 message: "Failed to update cart"
+            });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                message: "Cart item not found"
             });
         }
 
@@ -570,7 +580,6 @@ app.put("/api/cart/:cart_id", (req, res) => {
         });
     });
 });
-
 
 // ================= DELETE CART =================
 
@@ -582,11 +591,17 @@ app.delete("/api/cart/:cart_id", (req, res) => {
         WHERE cart_id = ?
     `;
 
-    db.query(sql, [cart_id], (err) => {
+    db.query(sql, [cart_id], (err, result) => {
         if (err) {
             console.error(err);
             return res.status(500).json({
                 message: "Failed to remove cart item"
+            });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({
+                message: "Cart item not found"
             });
         }
 
@@ -595,7 +610,6 @@ app.delete("/api/cart/:cart_id", (req, res) => {
         });
     });
 });
-
 
 // ================= CREATE ORDER =================
 
@@ -734,7 +748,6 @@ app.post("/api/orders", (req, res) => {
     );
 });
 
-
 // ================= USER ORDERS =================
 
 app.get("/api/orders/:user_id", (req, res) => {
@@ -759,7 +772,6 @@ app.get("/api/orders/:user_id", (req, res) => {
     });
 });
 
-
 // ================= ADMIN USERS =================
 
 app.get("/api/admin/users", (req, res) => {
@@ -781,7 +793,6 @@ app.get("/api/admin/users", (req, res) => {
     });
 });
 
-
 // ================= ADMIN ORDERS =================
 
 app.get("/api/admin/orders", (req, res) => {
@@ -802,7 +813,6 @@ app.get("/api/admin/orders", (req, res) => {
         res.json(results);
     });
 });
-
 
 // ================= ADMIN UPDATE ORDER STATUS =================
 
@@ -848,7 +858,6 @@ app.put("/api/admin/orders/:order_id", (req, res) => {
         });
     });
 });
-
 
 // ================= SERVER =================
 
